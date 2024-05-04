@@ -1,12 +1,9 @@
-
 import { Elements, FrontendComponents } from '../../components';
 import { Zustand } from '../../libs';
 import { FormInput } from '../../components/elements/formInput';
 import { Helmet } from 'react-helmet';
 export default function Profile() {
     const zustand = Zustand.useStore()
-
-
     return zustand.userData && (
         <>
             <Helmet >

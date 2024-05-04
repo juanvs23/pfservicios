@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { useRef, useState } from 'react'
+import { useRef } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
@@ -10,32 +10,38 @@ import PhoneInput from 'react-phone-input-2'
 import 'react-phone-input-2/lib/style.css'
 import { axios, cookieToken } from '../../../utils'
 import { Toast } from 'primereact/toast'
-
-
-
+import useFormInput from './useFormInput'
 export function FormInput(props) {
   const { setUserData, userData, setToken } = Zustand.useStore()
-  const [activeInput, setActiveInput] = useState(false)
-  const [inputValue, setInputValue] = useState(userData[props.id])
+
+  const { activeInput,
+    setActiveInput,
+    inputValue,
+    setInputValue } = useFormInput(props)
 
   let object = {}
+
   if (props.id === 'email') {
     object.email = yup
       .string()
       .email('Debe ser un correo valido')
       .required('El correo es requerido')
   }
+
   if (props.id === 'phone') {
     object.phone = yup.string().required('El teléfono es requerido')
   }
+
   if (props.id === 'indentification') {
     object.indentification = yup
       .string()
       .required('La identificación es requerida')
   }
+
   if (props.id === 'password') {
     object.password = yup.string().required('La contraseña es requerida')
   }
+  
   if (props.id === 'username') {
     object['username'] = yup.string().required('El texto es requerido')
   }

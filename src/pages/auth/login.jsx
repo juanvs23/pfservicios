@@ -11,15 +11,22 @@ import './inputs.scss'
 import { Zustand } from "../../libs";
 import { axios, cookieToken } from "../../utils";
 import { Toast } from "primereact/toast";
-
+import { useLoadingStore } from "../../store/useLoadingStore";
+import { ProgressSpinner } from 'primereact/progressspinner';
 
 const schema = yup.object({
     email: yup.string().email('Debe ser un correo valido').required("El correo es requerido"),
     newpassword: yup.string().required("La contraseña es requerida"),
 }).required();
+
 export default function Login() {
+
+    const { loading, setLoading } = useLoadingStore()
+
+    const toast = useRef("toast");
+
+
     const { setAuthModal, setIsLogin, setUserData, setIsAdmin } = Zustand.useStore()
-    const toast = useRef(null);
     const {
         register,
         handleSubmit,
@@ -29,10 +36,17 @@ export default function Login() {
     })
 
     const onSubmit = async (data) => {
+
+        setLoading(true)
+
         try {
             const response = await axios.createAxios().post('/user/login', data)
+
+            console.log(response)
+
             const responseData = response.data
-            console.log(responseData);
+            console.log(responseData)
+
             if (response && response.status === 200) {
                 const { data: { username, email, phone, indentification, role }, token } = responseData.data
                 setUserData({ username, email, phone, indentification, role })
@@ -46,16 +60,17 @@ export default function Login() {
                 setAuthModal({ open: true, content: <Elements.Greetings title={`Bienvenido ${username}`} text={'Presione el botón abajo para entrar a su cuenta'} />, title: "Acceso exitoso", setOpen: () => { setAuthModal({ open: false }) }, footer: <Elements.FooterModal /> })
             }
 
-        } catch (error) {
-            const responseError = error.response.data
-            // console.log(responseError);
-            toast.current.show({ severity: 'error', summary: 'Error', detail: responseError.data.error, life: 3000 });
+        } catch (err) {
+            const detail = err.response?.data.data.error ? err.response.data.data.error : "Error en la peticion"
+            toast.current.show({ severity: 'error', summary: 'Error', detail })
+        } finally {
+            setLoading(false)
         }
     }
 
-
     return (
         <>
+            <Toast ref={toast} />
             <Helmet>
                 <title>PFServicios | Iniciar sesión</title>
             </Helmet>
@@ -80,12 +95,19 @@ export default function Login() {
                                 </FloatLabel>
                             </div>
                         </div>
-                        <button className="w-full py-3 text-center text-white duration-300 rounded-md bg-secondary hover:bg-primary">Iniciar sesión</button>
+                        <button className="w-full py-3 text-center text-white duration-300 rounded-md bg-secondary hover:bg-primary">
+                            {loading ?
+                                <div className="text-center">
+                                    <ProgressSpinner aria-label="Loading" style={{ width: '30px', height: '30px' }} strokeWidth="5" />
+                                </div>
+                                : "Iniciar sesión"}
+
+                        </button>
                     </form>
                     <Divider />
                     <Elements.LostPassword />
                 </Elements.CardComponent>
-                <Toast ref={toast} />
+
             </FrontendComponents.Layout.AuthLayout>
         </>
     )
