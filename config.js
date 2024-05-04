@@ -3,6 +3,6 @@ export const config = {
     siteProdUrl:'https://pfservicios.vercel.app',
     siteDevUrl:'http://localhost:5173',
     devServerUrl:'http://localhost:8000',
-    prodServerUrl:'https://pfservicios.vercel.app',
+    prodServerUrl:'https://pfservicios-back.vercel.app',
     secretCode: 'pfservicios123',
 }
